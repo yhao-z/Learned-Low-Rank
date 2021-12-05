@@ -12,4 +12,4 @@ Ke, Z., Huang, W., Cui, Z. X., Cheng, J., Jia, S., Wang, H., ... & Liang, D. (20
 Learned Low-rank Priors in Dynamic MR Imaging. 
 IEEE Transactions on Medical Imaging, DOI: 10.1109/TMI.2021.3096218.
 ```
-
+the dataset is [OCMR](https://ocmr.info/). the coil sensibility maps is estimated by ESPIRiT, and we transfer the data into a single coil image.
