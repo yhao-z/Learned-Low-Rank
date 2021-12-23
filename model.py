@@ -14,18 +14,16 @@ class LR_Net(tf.keras.Model):
             self.celllist.append(LRCell(input_shape, i))
         self.celllist.append(LRCell(input_shape, self.niter-1, is_last=True))
 
-    def call(self, d, mask, csm, label):
+    def call(self, d, mask):
         """
         d: undersampled k-space
-        csm: coil sensitivity map
         mask: sampling mask
-        label: to test the SNRs, when test passed, it can be delete
         """
         # nb, nc, nt, nx, ny = d.shape
         x_rec = ifft2c_mri(d)
         A = tf.zeros_like(x_rec)
         L = tf.zeros_like(x_rec)
-        data = [x_rec, L, A, d, csm, mask, label]
+        data = [x_rec, L, A, d, mask]
 
         for i in range(self.niter):
             data = self.celllist[i](data)
@@ -53,11 +51,11 @@ class LRCell(layers.Layer):
             self.eta = tf.Variable(tf.constant(1, dtype=tf.float32), trainable=True, name='eta %d' % i)
 
     def call(self, data, **kwargs):
-        x_rec, L, A, d, csm, mask, label = data
+        x_rec, L, A, d, mask = data
 
         x_temp = x_rec + L
         A = self.lowrank_step(x_temp)
-        x_rec = self.x_step(L, A, d, csm, mask)
+        x_rec = self.x_step(L, A, d, mask)
         L = self.L_step(L, x_rec, A)
 
         data[0] = x_rec
@@ -66,7 +64,7 @@ class LRCell(layers.Layer):
 
         return data
 
-    def x_step(self, L, A, d, csm, mask):
+    def x_step(self, L, A, d, mask):
         temp = A - L
         k_rec = fft2c_mri(temp)  # tf.cast(tf.nn.relu(self.mu), tf.complex64)
         k_rec = tf.math.scalar_mul(tf.cast(tf.nn.relu(self.mu), tf.complex64), d) + k_rec

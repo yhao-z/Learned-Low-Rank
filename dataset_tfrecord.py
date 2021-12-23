@@ -42,7 +42,7 @@ def parse_function(example_proto):
 
 
 def get_dataset_singCoil(mode, batch_size, shuffle=False):
-    filenames = 'I:/OCMR - Cardiovascular MRI/OCMR_getlabel_SingleCoil/OCMR_singCoil_' + mode + '.tfrecord'
+    filenames = 'I:/OCMR - Cardiovascular MRI/OCMR_getlabel_SingleCoil/OCMR_3T_' + mode + '.tfrecord'
 
     dataset = tf.data.TFRecordDataset(filenames)
     dataset = dataset.map(singCoil_parse_function)

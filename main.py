@@ -1,23 +1,15 @@
 import tensorflow as tf
 import os
 from model import LR_Net
-from dataset_tfrecord import get_dataset, get_dataset_singCoil
+from dataset_tfrecord import get_dataset_singCoil
 import argparse
-import scipy.io as scio
-import mat73
 import numpy as np
-from datetime import datetime
 import time
-from tools import video_summary
 
-from tools import tempfft, mse, loss_LR, calc_SNR, fft2c_mri, ifft2c_mri
+from tools import mse, calc_SNR
 from tools import mask3d
 import matplotlib.pyplot as plt  # plt 用于显示图片
 import datetime
-
-# tf.debugging.set_log_device_placement(True)
-# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-# tf.debugging.set_log_device_placement(True)
 
 if __name__ == "__main__":
 
@@ -25,9 +17,8 @@ if __name__ == "__main__":
     parser.add_argument('--num_epoch', metavar='int', nargs=1, default=['50'], help='number of epochs')
     parser.add_argument('--batch_size', metavar='int', nargs=1, default=['1'], help='batch size')
     parser.add_argument('--learning_rate', metavar='float', nargs=1, default=['0.001'], help='initial learning rate')
-    parser.add_argument('--niter', metavar='int', nargs=1, default=['30'], help='number of network iterations')
+    parser.add_argument('--niter', metavar='int', nargs=1, default=['5'], help='number of network iterations')
     parser.add_argument('--gpu', metavar='int', nargs=1, default=['0'], help='GPU No.')
-    parser.add_argument('--multiCoil', metavar='int', nargs=1, default=['0'])
 
     args = parser.parse_args()
 
@@ -41,7 +32,6 @@ if __name__ == "__main__":
     num_epoch = int(args.num_epoch[0])
     learning_rate = float(args.learning_rate[0])
     niter = int(args.niter[0])
-    multicoil = int(args.multiCoil[0])
 
     logdir = './logs'
     TIMESTAMP = "{0:%Y-%m-%dT%H-%M-%S}".format(datetime.datetime.now())
@@ -54,10 +44,7 @@ if __name__ == "__main__":
     os.makedirs(modeldir)
 
     # prepare dataset
-    if multicoil == 1:
-        dataset = get_dataset(mode, batch_size, shuffle=True)
-    else:
-        dataset = get_dataset_singCoil(mode, batch_size, shuffle=True)
+    dataset = get_dataset_singCoil(mode, batch_size, shuffle=True)
     tf.print('dataset loaded.')
 
     # initialize network
@@ -79,26 +66,17 @@ if __name__ == "__main__":
 
             # forward
             t0 = time.time()
-            k0 = None
-            csm = None
             with tf.GradientTape() as tape:
-                if multicoil:
-                    k0, csm, label = sample
-                else:
-                    k0, label = sample
-                    csm = None
+                k0, label = sample
+                csm = None
 
                 if k0 is None:
                     continue
                 if k0.shape[0] < batch_size:
                     continue
 
-                label = np.array(label)
-                max_label = np.max(np.abs(label[:]))
-                label = tf.constant(label / max_label)
-                k0 = fft2c_mri(label)
-
-                label_abs = tf.abs(label)
+                # display the image using matplotlib
+                # label_abs = tf.abs(label)
                 # plt.figure(1)
                 # plt.imshow(label_abs[0, 0, :, :])
                 # plt.axis('off')  # 关掉坐标轴为 off
@@ -106,48 +84,26 @@ if __name__ == "__main__":
                 # plt.show()
 
                 # generate under-sampling mask (random)
-                if multicoil:
-                    nb, nc, nt, nx, ny = k0.get_shape()
-                    mask = mask3d(nx, ny, nt)
-                    mask = np.transpose(mask, (2, 0, 1))
-                    mask = np.tile(mask, (nc, 1, 1, 1))
-                    mask = tf.constant(np.complex64(mask + 0j))
-                else:
-                    nb, nt, nx, ny = k0.get_shape()
-                    mask = mask3d(nx, ny, nt)
-                    mask = np.transpose(mask, (2, 0, 1))
-                    mask = tf.constant(np.complex64(mask + 0j))
+                nb, nt, nx, ny = k0.get_shape()
+                mask = mask3d(nx, ny, nt)
+                mask = np.transpose(mask, (2, 0, 1))
+                mask = tf.constant(np.complex64(mask + 0j))
 
                 k0 = k0 * mask
-                # recon = ifft2c_mri(k0)
-                # plt.figure(2)
-                # plt.imshow(tf.abs(recon[0, 0, :, :]))
-                # plt.axis('off')  # 关掉坐标轴为 off
-                # plt.title('label')  # 图像题目
-                # plt.show()
-                # print(mse(recon, label))
 
-                recon = net(k0, mask, csm, label)
+                recon = net(k0, mask)
                 recon_abs = tf.abs(recon)
 
                 loss = mse(recon, label)
 
             # backward
-            grads = tape.gradient(loss, net.trainable_weights)  ####################################
-            optimizer.apply_gradients(zip(grads, net.trainable_weights))  #################################
+            grads = tape.gradient(loss, net.trainable_weights)
+            optimizer.apply_gradients(zip(grads, net.trainable_weights))
 
             # record loss
             with summary_writer.as_default():
                 tf.summary.scalar('loss/total', loss.numpy(), step=total_step)
                 tf.summary.scalar('SNR', calc_SNR(recon, label), step=total_step)
-
-
-            # # record gif
-            # if step % 20 == 0:
-            #     with summary_writer.as_default():
-            #         combine_video = tf.concat([label_abs[0:1, :, :, :], recon_abs[0:1, :, :, :]], axis=0).numpy()
-            #         combine_video = np.expand_dims(combine_video, -1)
-            #         video_summary('result', combine_video, step=total_step, fps=10)
 
             # calculate parameter number
             if total_step == 0:
