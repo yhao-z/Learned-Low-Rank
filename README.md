@@ -3,11 +3,7 @@
 
 
 
-* Using only the low rank Casorati matrix property and do not using any CNN Net, just an unfolding version of the algorithm which using ADMM to solve the following optimization problem
-
-<p align="center"> 
-<a href="https://www.latexlive.com/#JTIwJTIwJCQlMEElMjAlMjAlNUNtaW5feCUyMCU1Q2ZyYWMlMjAxMiUyMCU1Q1ZlcnQlMjBTRngtYiU1Q1ZlcnRfMiU1RTIrJTVDbGFtYmRhJTIwJTVDVmVydCUyMHglMjAlNUNWZXJ0XyolMEElMjAlMjAkJA==" /></a>
-</p>
+* Using only the low rank Casorati matrix property and do not using any CNN Net, just an unfolding version of the algorithm which using ADMM to solve the following optimization problem: [equation](https://www.latexlive.com/#JTIwJTIwJCQlMEElMjAlMjAlNUNtaW5feCUyMCU1Q2ZyYWMlMjAxMiUyMCU1Q1ZlcnQlMjBTRngtYiU1Q1ZlcnRfMiU1RTIrJTVDbGFtYmRhJTIwJTVDVmVydCUyMHglMjAlNUNWZXJ0XyolMEElMjAlMjAkJA==)
 
 * referred from [Keziwen/SLR-Net: Code for our work: "Learned Low-rank Priors in Dynamic MR Imaging" (github.com)](https://github.com/Keziwen/SLR-Net)
 
