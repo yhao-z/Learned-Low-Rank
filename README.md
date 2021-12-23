@@ -4,10 +4,12 @@
 
 
 * Using only the low rank Casorati matrix property and do not using any CNN Net, just an unfolding version of the algorithm which using ADMM to solve the following optimization problem
-  $$
-  \min_x \frac 12 \Vert SFx-b\Vert_2^2+\lambda \Vert x \Vert_*
-  $$
-  referred from [Keziwen/SLR-Net: Code for our work: "Learned Low-rank Priors in Dynamic MR Imaging" (github.com)](https://github.com/Keziwen/SLR-Net)
+
+<p align="center"> 
+<a href="https://www.latexlive.com/#JTIwJTIwJCQlMEElMjAlMjAlNUNtaW5feCUyMCU1Q2ZyYWMlMjAxMiUyMCU1Q1ZlcnQlMjBTRngtYiU1Q1ZlcnRfMiU1RTIrJTVDbGFtYmRhJTIwJTVDVmVydCUyMHglMjAlNUNWZXJ0XyolMEElMjAlMjAkJA==" /></a>
+</p>
+
+* referred from [Keziwen/SLR-Net: Code for our work: "Learned Low-rank Priors in Dynamic MR Imaging" (github.com)](https://github.com/Keziwen/SLR-Net)
 
 * the paper of SLR-Net is
 
