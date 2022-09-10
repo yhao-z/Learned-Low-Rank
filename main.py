@@ -68,7 +68,6 @@ if __name__ == "__main__":
             t0 = time.time()
             with tf.GradientTape() as tape:
                 k0, label = sample
-                csm = None
 
                 if k0 is None:
                     continue
