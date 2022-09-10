@@ -23,6 +23,7 @@ IEEE Transactions on Medical Imaging, DOI: 10.1109/TMI.2021.3096218.
 * `model.py` is the unfolding network code
 * `dataset_tfrecord.py` is the code for loading data from `*.tfrecord` files
 * `WriteTFRecord.py` & `WriteTFRecord_singleCoil.py` are the codes for making the `*.tfrecord` files from [OCMR](https://ocmr.info/) dataset BY MYSELF
+* `requirements.txt`: `pip install -r requirements.txt` install all the requirements
 
 #### NOTE
 
