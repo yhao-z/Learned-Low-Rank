@@ -1,5 +1,5 @@
 # Learned Low Rank
- Learned Low Rank Prior: **The easiest implementation of the deep unfolding network for MRI reconstruction.** 
+ Learned Low Rank Prior: **The easiest implementation of the deep unrolling/unfolding network for MRI reconstruction.** 
 
 
 * Using only the low rank Casorati matrix property and do not using any CNN Net, just an unfolding version of the algorithm which using ADMM to solve the following optimization problem: 
